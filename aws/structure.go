@@ -2740,6 +2740,11 @@ func expandCognitoUserPoolPasswordPolicy(config map[string]interface{}) *cognito
 		configs.RequireUppercase = aws.Bool(v.(bool))
 	}
 
+	if v, ok := config["temporary_password_validity_days"]; ok && v.(string) != "" {
+		vInt, _ := strconv.ParseInt(v.(string), 10, 64)
+		configs.TemporaryPasswordValidityDays = aws.Int64(vInt)
+	}
+
 	return configs
 }
 
@@ -3010,6 +3015,10 @@ func flattenCognitoUserPoolPasswordPolicy(s *cognitoidentityprovider.PasswordPol
 
 	if s.RequireUppercase != nil {
 		m["require_uppercase"] = *s.RequireUppercase
+	}
+
+	if s.TemporaryPasswordValidityDays != nil {
+		m["temporary_password_validity_days"] = fmt.Sprintf("%d", aws.Int64Value(s.TemporaryPasswordValidityDays))
 	}
 
 	if len(m) > 0 {
